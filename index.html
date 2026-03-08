@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelancer Tax Calculator (Singapore)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg-primary: #fcfcf9;
+            --color-bg-secondary: #fffffe;
+            --color-text-primary: #13343b;
+            --color-text-secondary: #626c71;
+            --color-accent: #4296CD;
+            --color-accent-hover: #2589C9;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-surface: #f5f5f5;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg-primary: #1f2121;
+                --color-bg-secondary: #262828;
+                --color-text-primary: #f1f5f9;
+                --color-text-secondary: #cbd5e1;
+                --color-accent: #A7DDFF;
+                --color-accent-hover: #4296CD;
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-surface: #334155;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--color-text-primary);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            background: var(--color-surface);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #2589C9;
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: var(--color-bg-secondary);
+        }
+
+        .period-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--color-surface);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .period-btn.active {
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .period-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .expense-toggle {
+            display: flex;
+            gap: 8px;
+            background: var(--color-surface);
+            padding: 4px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .expense-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .expense-btn.active {
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .expense-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .card {
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--color-border);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--color-text-primary);
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Inter Tight', sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-top: 4px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2589C9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calculate-btn:hover {
+            background: #1e6fa3;
+        }
+
+        .calculate-btn:active {
+            transform: translateY(1px);
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            padding-top: 20px;
+            margin-top: 8px;
+            border-top: 2px solid var(--color-border);
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .result-row:last-child .result-label {
+            font-size: 16px;
+            color: var(--color-text-primary);
+        }
+
+        .result-row:last-child .result-value {
+            font-size: 24px;
+            color: var(--color-accent);
+        }
+
+        .monthly-breakdown {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .info-box {
+            background: var(--color-surface);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .info-box strong {
+            color: var(--color-text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Freelancer Tax Calculator</h1>
+        <p class="subtitle">(Singapore) • Calculate take-home or required gross with IRAS tax & MediSave</p>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="btnMode1">Gross → Take-Home</button>
+            <button class="mode-btn" id="btnMode2">Take-Home → Gross</button>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label style="margin-bottom: 12px;">Time Period</label>
+                <div class="period-toggle">
+                    <button class="period-btn active" id="btnAnnual">Annual</button>
+                    <button class="period-btn" id="btnMonthly">Monthly</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="inputLabel">Annual Gross Revenue (SGD)</label>
+                <input type="number" id="mainInput" placeholder="150000" min="0" step="1000">
+                <div class="input-hint" id="inputHint">Your total annual income before expenses and tax</div>
+            </div>
+
+            <div class="form-group">
+                <label>Your Age</label>
+                <select id="ageGroup">
+                    <option value="under35">< 35 years</option>
+                    <option value="35to44">35-44 years</option>
+                    <option value="45to49">45-49 years</option>
+                    <option value="50plus">50+ years</option>
+                </select>
+                <div class="input-hint">For MediSave contribution calculation</div>
+            </div>
+
+            <div class="form-group">
+                <label>Business Expenses</label>
+                <div class="expense-toggle">
+                    <button class="expense-btn active" id="btnExpenseRate">Percentage (%)</button>
+                    <button class="expense-btn" id="btnExpenseAmount">Dollar Amount (S$)</button>
+                </div>
+                <input type="number" id="expenseRate" value="20" min="0" max="100" step="1">
+                <input type="number" id="expenseAmount" value="30000" min="0" step="1000" style="display: none;">
+                <div class="input-hint" id="expenseHint">Typical freelance expenses: 15-30%</div>
+            </div>
+
+            <button class="calculate-btn" id="btnCalculate">Calculate</button>
+        </div>
+
+        <div class="card results" id="results">
+            <div class="result-row">
+                <span class="result-label">Chargeable Income</span>
+                <span class="result-value" id="chargeableAmount">S$0</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Income Tax</span>
+                <span class="result-value" id="taxAmount">S$0</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Business Expenses</span>
+                <span class="result-value" id="expensesAmount">S$0</span>
+            </div>
+            <div class="result-row" id="medisaveRow" style="display: none;">
+                <span class="result-label">MediSave Contribution</span>
+                <span class="result-value" id="medisaveAmount">S$0</span>
+            </div>
+            <div class="result-row">
+                <div>
+                    <div class="result-label" id="resultLabel">Take-Home Income</div>
+                    <div class="monthly-breakdown" id="monthlyBreakdown" style="display: none;"></div>
+                </div>
+                <span class="result-value" id="resultAmount">S$0</span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Note:</strong> This calculator uses IRAS progressive tax brackets (0-24%) and compulsory MediSave contributions for self-employed (applies when ANNUAL Chargeable Income > S$6,000). MediSave threshold is checked against your annual income, not monthly. MediSave rates: 8-10.5% based on age, with annual caps (S$7,104-S$9,324). Always consult a tax professional for accurate filing.
+        </div>
+    </div>
+
+    <script>
+        // Singapore progressive tax brackets (YA 2025/2026)
+        const SG_BRACKETS = [
+            { max: 20000, rate: 0.00 },
+            { max: 30000, rate: 0.02 },
+            { max: 40000, rate: 0.035 },
+            { max: 80000, rate: 0.07 },
+            { max: 120000, rate: 0.115 },
+            { max: 160000, rate: 0.15 },
+            { max: 200000, rate: 0.18 },
+            { max: 240000, rate: 0.19 },
+            { max: 280000, rate: 0.195 },
+            { max: 320000, rate: 0.20 },
+            { max: 500000, rate: 0.22 },
+            { max: 1000000, rate: 0.23 },
+            { max: Infinity, rate: 0.24 }
+        ];
+
+        let currentMode = 'grossToTakeHome';
+        let currentPeriod = 'annual';
+        let expenseMode = 'rate'; // 'rate' or 'amount'
+
+        // MediSave contribution rates and caps (YA 2025/2026)
+        const MEDISAVE_RATES = {
+            under35: { rate: 0.08, cap: 7104 },
+            '35to44': { rate: 0.09, cap: 7992 },
+            '45to49': { rate: 0.10, cap: 8880 },
+            '50plus': { rate: 0.105, cap: 9324 }
+        };
+
+        const MEDISAVE_THRESHOLD = 6000; // Compulsory if annual NTI > S$6,000
+
+        // Calculate MediSave contribution based on ANNUAL chargeable income
+        function computeMediSave(annualChargeableIncome, ageGroup) {
+            if (annualChargeableIncome <= MEDISAVE_THRESHOLD) return 0;
+            
+            const medisaveConfig = MEDISAVE_RATES[ageGroup];
+            const contribution = annualChargeableIncome * medisaveConfig.rate;
+            
+            return Math.min(contribution, medisaveConfig.cap);
+        }
+
+        // Calculate tax using progressive brackets
+        function computeTax(chargeableIncome, brackets) {
+            let tax = 0;
+            let prevCap = 0;
+
+            for (const bracket of brackets) {
+                if (chargeableIncome <= prevCap) break;
+
+                const thisCap = Math.min(bracket.max, chargeableIncome);
+                const taxableIn = thisCap - prevCap;
+                tax += taxableIn * bracket.rate;
+
+                prevCap = bracket.max;
+            }
+
+            return tax;
+        }
+
+        // Mode 1: Gross → Take-Home
+        function grossToTakeHome(gross, expenseValue, brackets, ageGroup, isRate = true) {
+            const expenses = isRate ? gross * expenseValue : expenseValue;
+            const chargeable = gross - expenses;
+            const tax = computeTax(chargeable, brackets);
+            const medisave = computeMediSave(chargeable, ageGroup);
+            const takeHome = gross - tax - expenses - medisave;
+
+            return { gross, chargeable, tax, expenses, medisave, takeHome };
+        }
+
+        // Mode 2: Take-Home → Gross (reverse calculation)
+        function takeHomeToGross(targetTakeHome, expenseValue, brackets, ageGroup, isRate = true) {
+            let gross = isRate ? targetTakeHome / (1 - expenseValue) : targetTakeHome + expenseValue;
+            let iteration = 0;
+            const maxIterations = 50;
+
+            while (iteration < maxIterations) {
+                const expenses = isRate ? gross * expenseValue : expenseValue;
+                const chargeable = gross - expenses;
+                const tax = computeTax(chargeable, brackets);
+                const medisave = computeMediSave(chargeable, ageGroup);
+                const actualTakeHome = gross - tax - expenses - medisave;
+
+                const diff = targetTakeHome - actualTakeHome;
+
+                if (Math.abs(diff) < 1) break;
+
+                gross += diff * 1.3;
+                iteration++;
+            }
+
+            return gross;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return 'S$' + amount.toLocaleString('en-SG', { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+        }
+
+        // Update expense input labels
+        function updateExpenseLabels() {
+            const periodLabel = currentPeriod === 'annual' ? 'annual' : 'monthly';
+            if (expenseMode === 'rate') {
+                document.getElementById('expenseHint').innerText = 'Typical freelance expenses: 15-30%';
+            } else {
+                document.getElementById('expenseHint').innerText = `Fixed ${periodLabel} business expenses in SGD`;
+            }
+        }
+
+        // Update labels based on mode and period
+        function updateLabels() {
+            const periodLabel = currentPeriod === 'annual' ? 'Annual' : 'Monthly';
+            const periodHintGross = currentPeriod === 'annual' 
+                ? 'Your total annual income before expenses and tax'
+                : 'Your monthly income before expenses and tax';
+            const periodHintTakeHome = currentPeriod === 'annual'
+                ? 'How much you want to take home after tax and expenses'
+                : 'Your desired monthly take-home after tax and expenses';
+            const placeholderGross = currentPeriod === 'annual' ? '150000' : '12500';
+            const placeholderTakeHome = currentPeriod === 'annual' ? '100000' : '8333';
+
+            if (currentMode === 'grossToTakeHome') {
+                document.getElementById('inputLabel').innerText = `${periodLabel} Gross Revenue (SGD)`;
+                document.getElementById('inputHint').innerText = periodHintGross;
+                document.getElementById('resultLabel').innerText = 'Take-Home Income';
+                document.getElementById('mainInput').placeholder = placeholderGross;
+            } else {
+                document.getElementById('inputLabel').innerText = `Desired ${periodLabel} Take-Home (SGD)`;
+                document.getElementById('inputHint').innerText = periodHintTakeHome;
+                document.getElementById('resultLabel').innerText = 'Required Gross Revenue';
+                document.getElementById('mainInput').placeholder = placeholderTakeHome;
+            }
+        }
+
+        // Expense mode toggle buttons
+        document.getElementById('btnExpenseRate').onclick = () => {
+            expenseMode = 'rate';
+            document.getElementById('btnExpenseRate').classList.add('active');
+            document.getElementById('btnExpenseAmount').classList.remove('active');
+            document.getElementById('expenseRate').style.display = 'block';
+            document.getElementById('expenseAmount').style.display = 'none';
+            updateExpenseLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        document.getElementById('btnExpenseAmount').onclick = () => {
+            expenseMode = 'amount';
+            document.getElementById('btnExpenseRate').classList.remove('active');
+            document.getElementById('btnExpenseAmount').classList.add('active');
+            document.getElementById('expenseRate').style.display = 'none';
+            document.getElementById('expenseAmount').style.display = 'block';
+            updateExpenseLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        // Period toggle buttons
+        document.getElementById('btnAnnual').onclick = () => {
+            currentPeriod = 'annual';
+            document.getElementById('btnAnnual').classList.add('active');
+            document.getElementById('btnMonthly').classList.remove('active');
+            updateLabels();
+            updateExpenseLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        document.getElementById('btnMonthly').onclick = () => {
+            currentPeriod = 'monthly';
+            document.getElementById('btnAnnual').classList.remove('active');
+            document.getElementById('btnMonthly').classList.add('active');
+            updateLabels();
+            updateExpenseLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        // Mode toggle buttons
+        document.getElementById('btnMode1').onclick = () => {
+            currentMode = 'grossToTakeHome';
+            document.getElementById('btnMode1').classList.add('active');
+            document.getElementById('btnMode2').classList.remove('active');
+            updateLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        document.getElementById('btnMode2').onclick = () => {
+            currentMode = 'takeHomeToGross';
+            document.getElementById('btnMode1').classList.remove('active');
+            document.getElementById('btnMode2').classList.add('active');
+            updateLabels();
+            document.getElementById('results').classList.remove('show');
+        };
+
+        // Calculate button
+        document.getElementById('btnCalculate').onclick = () => {
+            let mainValue = parseFloat(document.getElementById('mainInput').value);
+            const ageGroup = document.getElementById('ageGroup').value;
+            
+            let expenseValue;
+            let isExpenseRate = expenseMode === 'rate';
+            
+            if (expenseMode === 'rate') {
+                expenseValue = parseFloat(document.getElementById('expenseRate').value) / 100;
+                if (isNaN(expenseValue) || expenseValue < 0 || expenseValue >= 1) {
+                    alert('Please enter a valid expense rate (0-99%)');
+                    return;
+                }
+            } else {
+                expenseValue = parseFloat(document.getElementById('expenseAmount').value);
+                if (isNaN(expenseValue) || expenseValue < 0) {
+                    alert('Please enter a valid expense amount');
+                    return;
+                }
+            }
+
+            if (isNaN(mainValue) || mainValue <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            // Convert monthly to annual for calculation
+            const annualValue = currentPeriod === 'monthly' ? mainValue * 12 : mainValue;
+            const annualExpense = (!isExpenseRate && currentPeriod === 'monthly') ? expenseValue * 12 : expenseValue;
+
+            let result;
+
+            if (currentMode === 'grossToTakeHome') {
+                result = grossToTakeHome(annualValue, annualExpense, SG_BRACKETS, ageGroup, isExpenseRate);
+            } else {
+                const grossRequired = takeHomeToGross(annualValue, annualExpense, SG_BRACKETS, ageGroup, isExpenseRate);
+                result = grossToTakeHome(grossRequired, annualExpense, SG_BRACKETS, ageGroup, isExpenseRate);
+            }
+
+            // Convert results back to monthly if needed
+            if (currentPeriod === 'monthly') {
+                result.chargeable = result.chargeable / 12;
+                result.tax = result.tax / 12;
+                result.expenses = result.expenses / 12;
+                result.medisave = result.medisave / 12;
+                result.takeHome = result.takeHome / 12;
+                result.gross = result.gross / 12;
+            }
+
+            // Display results
+            document.getElementById('chargeableAmount').innerText = formatCurrency(result.chargeable);
+            document.getElementById('taxAmount').innerText = formatCurrency(result.tax);
+            document.getElementById('expensesAmount').innerText = formatCurrency(result.expenses);
+            
+            // Show/hide MediSave row
+            if (result.medisave > 0) {
+                document.getElementById('medisaveRow').style.display = 'flex';
+                document.getElementById('medisaveAmount').innerText = formatCurrency(result.medisave);
+            } else {
+                document.getElementById('medisaveRow').style.display = 'none';
+            }
+
+            if (currentMode === 'grossToTakeHome') {
+                document.getElementById('resultAmount').innerText = formatCurrency(result.takeHome);
+            } else {
+                document.getElementById('resultAmount').innerText = formatCurrency(result.gross);
+            }
+
+            // Show monthly breakdown for annual calculations
+            const monthlyBreakdown = document.getElementById('monthlyBreakdown');
+            if (currentPeriod === 'annual') {
+                const monthlyAmount = currentMode === 'grossToTakeHome' 
+                    ? result.takeHome / 12 
+                    : result.gross / 12;
+                monthlyBreakdown.innerText = formatCurrency(monthlyAmount) + '/month';
+                monthlyBreakdown.style.display = 'block';
+            } else {
+                monthlyBreakdown.style.display = 'none';
+            }
+
+            document.getElementById('results').classList.add('show');
+        };
+
+        // Hide results when inputs change
+        function hideResults() {
+            document.getElementById('results').classList.remove('show');
+        }
+
+        document.getElementById('mainInput').addEventListener('input', hideResults);
+        document.getElementById('expenseRate').addEventListener('input', hideResults);
+        document.getElementById('expenseAmount').addEventListener('input', hideResults);
+        document.getElementById('ageGroup').addEventListener('change', hideResults);
+
+        // Allow Enter key to calculate
+        document.getElementById('mainInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('btnCalculate').click();
+        });
+
+        document.getElementById('expenseRate').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('btnCalculate').click();
+        });
+
+        document.getElementById('expenseAmount').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('btnCalculate').click();
+        });
+    </script>
+</body>
+</html>
